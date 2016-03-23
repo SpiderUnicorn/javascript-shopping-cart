@@ -1,0 +1,22 @@
+{
+  "name": "javascript-shopping-cart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SpiderUnicorn/javascript-shopping-cart.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SpiderUnicorn/javascript-shopping-cart/issues"
+  },
+  "homepage": "https://github.com/SpiderUnicorn/javascript-shopping-cart#readme"
+}
