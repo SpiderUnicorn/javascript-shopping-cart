@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/SpiderUnicorn/javascript-shopping-cart/issues"
   },
-  "homepage": "https://github.com/SpiderUnicorn/javascript-shopping-cart#readme"
+  "homepage": "https://github.com/SpiderUnicorn/javascript-shopping-cart#readme",
+  "devDependencies": {
+    "karma-jasmine": "^0.3.8",
+    "karma-phantomjs-launcher": "^1.0.0"
+  }
 }
