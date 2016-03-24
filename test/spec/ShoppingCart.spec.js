@@ -113,6 +113,7 @@
 
                 expect(cart.item(product).quantity).toBe(2);
             });
+
         });
     });
 }());
