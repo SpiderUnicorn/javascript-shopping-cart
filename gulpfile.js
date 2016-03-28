@@ -3,7 +3,7 @@ var plato = require('plato');
 
 gulp.task('plato', function() {
     var files = [
-        'lib/ShoppingCart.js',
+        'lib/**/*.js',
     ];
 
     var outputDir = './report';

@@ -1,26 +1,26 @@
 {
-  "name": "javascript-shopping-cart",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SpiderUnicorn/javascript-shopping-cart.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/SpiderUnicorn/javascript-shopping-cart/issues"
-  },
-  "homepage": "https://github.com/SpiderUnicorn/javascript-shopping-cart#readme",
-  "devDependencies": {
-    "karma-jasmine": "^0.3.8",
-    "karma-phantomjs-launcher": "^1.0.0"
-  }
+    "name": "javascript-shopping-cart",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "karma start"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SpiderUnicorn/javascript-shopping-cart.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/SpiderUnicorn/javascript-shopping-cart/issues"
+    },
+    "homepage": "https://github.com/SpiderUnicorn/javascript-shopping-cart#readme",
+    "devDependencies": {
+        "karma-jasmine": "^0.3.8",
+        "karma-phantomjs-launcher": "^1.0.0"
+    }
 }
