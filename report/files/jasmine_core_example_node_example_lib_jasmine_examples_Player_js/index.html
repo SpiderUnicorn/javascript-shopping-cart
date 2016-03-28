@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Plato - lib/ShoppingCart.js</title>
+  <title>Plato - jasmine-core/example/node_example/lib/jasmine_examples/Player.js</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
@@ -36,7 +36,7 @@
 
 <div class="jumbotron">
   <div class="container">
-    <h1>lib/ShoppingCart.js</h1>
+    <h1>jasmine-core/example/node_example/lib/jasmine_examples/Player.js</h1>
   </div>
 </div>
 
@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">79.70</p>
+      <p class="stat">89.18</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">75</p>
+      <p class="stat">24</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">33.26</p>
+      <p class="stat">7.97</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.30</p>
+      <p class="stat">0.12</p>
     </div>
   </div>
 </div>
@@ -89,81 +89,30 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">var ShoppingCart = (function() {
-    &#039;use strict&#039;;
+    <textarea id="file-source" class="col-md-12">function Player() {
+}
+Player.prototype.play = function(song) {
+  this.currentlyPlayingSong = song;
+  this.isPlaying = true;
+};
 
-    function ShoppingCart() {
-        this.products = [];
-    }
+Player.prototype.pause = function() {
+  this.isPlaying = false;
+};
 
-    /**
-     * Sum
-     * @returns {number} The sum of all items with their respective quantities
-     */
-    ShoppingCart.prototype.sum = function() {
-        var sum = 0;
-        this.products.forEach(function(product) {
-            sum += product.price * product.quantity;
-        });
-        return sum;
-    };
+Player.prototype.resume = function() {
+  if (this.isPlaying) {
+    throw new Error(&quot;song is already playing&quot;);
+  }
 
-    /**
-     * Add a product
-     * @param {object} product Adds a product to the cart.
-     *                         If the product allready exists, the quantity
-     *                         will be incremented instead.
-     */
-    ShoppingCart.prototype.addProduct = function(product) {
-        if (this.products.indexOf(product) != -1) {
-            product.quantity++;
-        } else {
-            product.quantity = 1;
-            this.products.push(product);
-        }
-    };
+  this.isPlaying = true;
+};
 
-    /**
-     * Remove a product
-     * @param {object} product Removes a product from the cart
-     */
-    ShoppingCart.prototype.removeProduct = function(product) {
-        this.products.splice(this.products.indexOf(product), 1);
-    };
+Player.prototype.makeFavorite = function() {
+  this.currentlyPlayingSong.persistFavoriteStatus(true);
+};
 
-    /**
-     * Increment quantity
-     * @param {object} product Increments the product quantity by 1
-     */
-    ShoppingCart.prototype.incrementQuantity = function(product) {
-        product.quantity++;
-    };
-
-    /**
-     * Decrement quantity
-     * @param {object} product Decrements the product quantity by 1
-     */
-    ShoppingCart.prototype.decrementQuantity = function(product) {
-        product.quantity--;
-        if (product.quantity &lt; 1) {
-            this.removeProduct(product);
-        }
-    };
-
-    /**
-     * Get an item
-     * @param   {object} p Product to retrieve
-     * @returns {object} Product Retrieved product
-     */
-    ShoppingCart.prototype.item = function(p) {
-        return this.products.filter(function(product) {
-            return product === p;
-        })[0];
-    };
-
-    return ShoppingCart;
-
-}());</textarea>
+module.exports = Player;</textarea>
   </div>
 </div>
 

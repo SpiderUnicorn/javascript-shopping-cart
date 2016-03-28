@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - jasmine-core/jasmine-html.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>jasmine-core/jasmine-html.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">64.46</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">451</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">55.74</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">5.24</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*
+Copyright (c) 2008-2015 Pivotal Labs
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+&quot;Software&quot;), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+jasmineRequire.html = function(j$) {
+  j$.ResultsNode = jasmineRequire.ResultsNode();
+  j$.HtmlReporter = jasmineRequire.HtmlReporter(j$);
+  j$.QueryString = jasmineRequire.QueryString();
+  j$.HtmlSpecFilter = jasmineRequire.HtmlSpecFilter();
+};
+
+jasmineRequire.HtmlReporter = function(j$) {
+
+  var noopTimer = {
+    start: function() {},
+    elapsed: function() { return 0; }
+  };
+
+  function HtmlReporter(options) {
+    var env = options.env || {},
+      getContainer = options.getContainer,
+      createElement = options.createElement,
+      createTextNode = options.createTextNode,
+      onRaiseExceptionsClick = options.onRaiseExceptionsClick || function() {},
+      onThrowExpectationsClick = options.onThrowExpectationsClick || function() {},
+      onRandomClick = options.onRandomClick || function() {},
+      addToExistingQueryString = options.addToExistingQueryString || defaultQueryString,
+      timer = options.timer || noopTimer,
+      results = [],
+      specsExecuted = 0,
+      failureCount = 0,
+      pendingSpecCount = 0,
+      htmlReporterMain,
+      symbols,
+      failedSuites = [];
+
+    this.initialize = function() {
+      clearPrior();
+      htmlReporterMain = createDom(&#039;div&#039;, {className: &#039;jasmine_html-reporter&#039;},
+        createDom(&#039;div&#039;, {className: &#039;jasmine-banner&#039;},
+          createDom(&#039;a&#039;, {className: &#039;jasmine-title&#039;, href: &#039;http://jasmine.github.io/&#039;, target: &#039;_blank&#039;}),
+          createDom(&#039;span&#039;, {className: &#039;jasmine-version&#039;}, j$.version)
+        ),
+        createDom(&#039;ul&#039;, {className: &#039;jasmine-symbol-summary&#039;}),
+        createDom(&#039;div&#039;, {className: &#039;jasmine-alert&#039;}),
+        createDom(&#039;div&#039;, {className: &#039;jasmine-results&#039;},
+          createDom(&#039;div&#039;, {className: &#039;jasmine-failures&#039;})
+        )
+      );
+      getContainer().appendChild(htmlReporterMain);
+    };
+
+    var totalSpecsDefined;
+    this.jasmineStarted = function(options) {
+      totalSpecsDefined = options.totalSpecsDefined || 0;
+      timer.start();
+    };
+
+    var summary = createDom(&#039;div&#039;, {className: &#039;jasmine-summary&#039;});
+
+    var topResults = new j$.ResultsNode({}, &#039;&#039;, null),
+      currentParent = topResults;
+
+    this.suiteStarted = function(result) {
+      currentParent.addChild(result, &#039;suite&#039;);
+      currentParent = currentParent.last();
+    };
+
+    this.suiteDone = function(result) {
+      if (result.status == &#039;failed&#039;) {
+        failedSuites.push(result);
+      }
+
+      if (currentParent == topResults) {
+        return;
+      }
+
+      currentParent = currentParent.parent;
+    };
+
+    this.specStarted = function(result) {
+      currentParent.addChild(result, &#039;spec&#039;);
+    };
+
+    var failures = [];
+    this.specDone = function(result) {
+      if(noExpectations(result) &amp;&amp; typeof console !== &#039;undefined&#039; &amp;&amp; typeof console.error !== &#039;undefined&#039;) {
+        console.error(&#039;Spec \&#039;&#039; + result.fullName + &#039;\&#039; has no expectations.&#039;);
+      }
+
+      if (result.status != &#039;disabled&#039;) {
+        specsExecuted++;
+      }
+
+      if (!symbols){
+        symbols = find(&#039;.jasmine-symbol-summary&#039;);
+      }
+
+      symbols.appendChild(createDom(&#039;li&#039;, {
+          className: noExpectations(result) ? &#039;jasmine-empty&#039; : &#039;jasmine-&#039; + result.status,
+          id: &#039;spec_&#039; + result.id,
+          title: result.fullName
+        }
+      ));
+
+      if (result.status == &#039;failed&#039;) {
+        failureCount++;
+
+        var failure =
+          createDom(&#039;div&#039;, {className: &#039;jasmine-spec-detail jasmine-failed&#039;},
+            createDom(&#039;div&#039;, {className: &#039;jasmine-description&#039;},
+              createDom(&#039;a&#039;, {title: result.fullName, href: specHref(result)}, result.fullName)
+            ),
+            createDom(&#039;div&#039;, {className: &#039;jasmine-messages&#039;})
+          );
+        var messages = failure.childNodes[1];
+
+        for (var i = 0; i &lt; result.failedExpectations.length; i++) {
+          var expectation = result.failedExpectations[i];
+          messages.appendChild(createDom(&#039;div&#039;, {className: &#039;jasmine-result-message&#039;}, expectation.message));
+          messages.appendChild(createDom(&#039;div&#039;, {className: &#039;jasmine-stack-trace&#039;}, expectation.stack));
+        }
+
+        failures.push(failure);
+      }
+
+      if (result.status == &#039;pending&#039;) {
+        pendingSpecCount++;
+      }
+    };
+
+    this.jasmineDone = function(doneResult) {
+      var banner = find(&#039;.jasmine-banner&#039;);
+      var alert = find(&#039;.jasmine-alert&#039;);
+      var order = doneResult &amp;&amp; doneResult.order;
+      alert.appendChild(createDom(&#039;span&#039;, {className: &#039;jasmine-duration&#039;}, &#039;finished in &#039; + timer.elapsed() / 1000 + &#039;s&#039;));
+
+      banner.appendChild(
+        createDom(&#039;div&#039;, { className: &#039;jasmine-run-options&#039; },
+          createDom(&#039;span&#039;, { className: &#039;jasmine-trigger&#039; }, &#039;Options&#039;),
+          createDom(&#039;div&#039;, { className: &#039;jasmine-payload&#039; },
+            createDom(&#039;div&#039;, { className: &#039;jasmine-exceptions&#039; },
+              createDom(&#039;input&#039;, {
+                className: &#039;jasmine-raise&#039;,
+                id: &#039;jasmine-raise-exceptions&#039;,
+                type: &#039;checkbox&#039;
+              }),
+              createDom(&#039;label&#039;, { className: &#039;jasmine-label&#039;, &#039;for&#039;: &#039;jasmine-raise-exceptions&#039; }, &#039;raise exceptions&#039;)),
+            createDom(&#039;div&#039;, { className: &#039;jasmine-throw-failures&#039; },
+              createDom(&#039;input&#039;, {
+                className: &#039;jasmine-throw&#039;,
+                id: &#039;jasmine-throw-failures&#039;,
+                type: &#039;checkbox&#039;
+              }),
+              createDom(&#039;label&#039;, { className: &#039;jasmine-label&#039;, &#039;for&#039;: &#039;jasmine-throw-failures&#039; }, &#039;stop spec on expectation failure&#039;)),
+            createDom(&#039;div&#039;, { className: &#039;jasmine-random-order&#039; },
+              createDom(&#039;input&#039;, {
+                className: &#039;jasmine-random&#039;,
+                id: &#039;jasmine-random-order&#039;,
+                type: &#039;checkbox&#039;
+              }),
+              createDom(&#039;label&#039;, { className: &#039;jasmine-label&#039;, &#039;for&#039;: &#039;jasmine-random-order&#039; }, &#039;run tests in random order&#039;))
+          )
+        ));
+
+      var raiseCheckbox = find(&#039;#jasmine-raise-exceptions&#039;);
+
+      raiseCheckbox.checked = !env.catchingExceptions();
+      raiseCheckbox.onclick = onRaiseExceptionsClick;
+
+      var throwCheckbox = find(&#039;#jasmine-throw-failures&#039;);
+      throwCheckbox.checked = env.throwingExpectationFailures();
+      throwCheckbox.onclick = onThrowExpectationsClick;
+
+      var randomCheckbox = find(&#039;#jasmine-random-order&#039;);
+      randomCheckbox.checked = env.randomTests();
+      randomCheckbox.onclick = onRandomClick;
+
+      var optionsMenu = find(&#039;.jasmine-run-options&#039;),
+          optionsTrigger = optionsMenu.querySelector(&#039;.jasmine-trigger&#039;),
+          optionsPayload = optionsMenu.querySelector(&#039;.jasmine-payload&#039;),
+          isOpen = /\bjasmine-open\b/;
+
+      optionsTrigger.onclick = function() {
+        if (isOpen.test(optionsPayload.className)) {
+          optionsPayload.className = optionsPayload.className.replace(isOpen, &#039;&#039;);
+        } else {
+          optionsPayload.className += &#039; jasmine-open&#039;;
+        }
+      };
+
+      if (specsExecuted &lt; totalSpecsDefined) {
+        var skippedMessage = &#039;Ran &#039; + specsExecuted + &#039; of &#039; + totalSpecsDefined + &#039; specs - run all&#039;;
+        alert.appendChild(
+          createDom(&#039;span&#039;, {className: &#039;jasmine-bar jasmine-skipped&#039;},
+            createDom(&#039;a&#039;, {href: &#039;?&#039;, title: &#039;Run all specs&#039;}, skippedMessage)
+          )
+        );
+      }
+      var statusBarMessage = &#039;&#039;;
+      var statusBarClassName = &#039;jasmine-bar &#039;;
+
+      if (totalSpecsDefined &gt; 0) {
+        statusBarMessage += pluralize(&#039;spec&#039;, specsExecuted) + &#039;, &#039; + pluralize(&#039;failure&#039;, failureCount);
+        if (pendingSpecCount) { statusBarMessage += &#039;, &#039; + pluralize(&#039;pending spec&#039;, pendingSpecCount); }
+        statusBarClassName += (failureCount &gt; 0) ? &#039;jasmine-failed&#039; : &#039;jasmine-passed&#039;;
+      } else {
+        statusBarClassName += &#039;jasmine-skipped&#039;;
+        statusBarMessage += &#039;No specs found&#039;;
+      }
+
+      var seedBar;
+      if (order &amp;&amp; order.random) {
+        seedBar = createDom(&#039;span&#039;, {className: &#039;jasmine-seed-bar&#039;},
+          &#039;, randomized with seed &#039;,
+          createDom(&#039;a&#039;, {title: &#039;randomized with seed &#039; + order.seed, href: seedHref(order.seed)}, order.seed)
+        );
+      }
+
+      alert.appendChild(createDom(&#039;span&#039;, {className: statusBarClassName}, statusBarMessage, seedBar));
+
+      for(i = 0; i &lt; failedSuites.length; i++) {
+        var failedSuite = failedSuites[i];
+        for(var j = 0; j &lt; failedSuite.failedExpectations.length; j++) {
+          var errorBarMessage = &#039;AfterAll &#039; + failedSuite.failedExpectations[j].message;
+          var errorBarClassName = &#039;jasmine-bar jasmine-errored&#039;;
+          alert.appendChild(createDom(&#039;span&#039;, {className: errorBarClassName}, errorBarMessage));
+        }
+      }
+
+      var results = find(&#039;.jasmine-results&#039;);
+      results.appendChild(summary);
+
+      summaryList(topResults, summary);
+
+      function summaryList(resultsTree, domParent) {
+        var specListNode;
+        for (var i = 0; i &lt; resultsTree.children.length; i++) {
+          var resultNode = resultsTree.children[i];
+          if (resultNode.type == &#039;suite&#039;) {
+            var suiteListNode = createDom(&#039;ul&#039;, {className: &#039;jasmine-suite&#039;, id: &#039;suite-&#039; + resultNode.result.id},
+              createDom(&#039;li&#039;, {className: &#039;jasmine-suite-detail&#039;},
+                createDom(&#039;a&#039;, {href: specHref(resultNode.result)}, resultNode.result.description)
+              )
+            );
+
+            summaryList(resultNode, suiteListNode);
+            domParent.appendChild(suiteListNode);
+          }
+          if (resultNode.type == &#039;spec&#039;) {
+            if (domParent.getAttribute(&#039;class&#039;) != &#039;jasmine-specs&#039;) {
+              specListNode = createDom(&#039;ul&#039;, {className: &#039;jasmine-specs&#039;});
+              domParent.appendChild(specListNode);
+            }
+            var specDescription = resultNode.result.description;
+            if(noExpectations(resultNode.result)) {
+              specDescription = &#039;SPEC HAS NO EXPECTATIONS &#039; + specDescription;
+            }
+            if(resultNode.result.status === &#039;pending&#039; &amp;&amp; resultNode.result.pendingReason !== &#039;&#039;) {
+              specDescription = specDescription + &#039; PENDING WITH MESSAGE: &#039; + resultNode.result.pendingReason;
+            }
+            specListNode.appendChild(
+              createDom(&#039;li&#039;, {
+                  className: &#039;jasmine-&#039; + resultNode.result.status,
+                  id: &#039;spec-&#039; + resultNode.result.id
+                },
+                createDom(&#039;a&#039;, {href: specHref(resultNode.result)}, specDescription)
+              )
+            );
+          }
+        }
+      }
+
+      if (failures.length) {
+        alert.appendChild(
+          createDom(&#039;span&#039;, {className: &#039;jasmine-menu jasmine-bar jasmine-spec-list&#039;},
+            createDom(&#039;span&#039;, {}, &#039;Spec List | &#039;),
+            createDom(&#039;a&#039;, {className: &#039;jasmine-failures-menu&#039;, href: &#039;#&#039;}, &#039;Failures&#039;)));
+        alert.appendChild(
+          createDom(&#039;span&#039;, {className: &#039;jasmine-menu jasmine-bar jasmine-failure-list&#039;},
+            createDom(&#039;a&#039;, {className: &#039;jasmine-spec-list-menu&#039;, href: &#039;#&#039;}, &#039;Spec List&#039;),
+            createDom(&#039;span&#039;, {}, &#039; | Failures &#039;)));
+
+        find(&#039;.jasmine-failures-menu&#039;).onclick = function() {
+          setMenuModeTo(&#039;jasmine-failure-list&#039;);
+        };
+        find(&#039;.jasmine-spec-list-menu&#039;).onclick = function() {
+          setMenuModeTo(&#039;jasmine-spec-list&#039;);
+        };
+
+        setMenuModeTo(&#039;jasmine-failure-list&#039;);
+
+        var failureNode = find(&#039;.jasmine-failures&#039;);
+        for (var i = 0; i &lt; failures.length; i++) {
+          failureNode.appendChild(failures[i]);
+        }
+      }
+    };
+
+    return this;
+
+    function find(selector) {
+      return getContainer().querySelector(&#039;.jasmine_html-reporter &#039; + selector);
+    }
+
+    function clearPrior() {
+      // return the reporter
+      var oldReporter = find(&#039;&#039;);
+
+      if(oldReporter) {
+        getContainer().removeChild(oldReporter);
+      }
+    }
+
+    function createDom(type, attrs, childrenVarArgs) {
+      var el = createElement(type);
+
+      for (var i = 2; i &lt; arguments.length; i++) {
+        var child = arguments[i];
+
+        if (typeof child === &#039;string&#039;) {
+          el.appendChild(createTextNode(child));
+        } else {
+          if (child) {
+            el.appendChild(child);
+          }
+        }
+      }
+
+      for (var attr in attrs) {
+        if (attr == &#039;className&#039;) {
+          el[attr] = attrs[attr];
+        } else {
+          el.setAttribute(attr, attrs[attr]);
+        }
+      }
+
+      return el;
+    }
+
+    function pluralize(singular, count) {
+      var word = (count == 1 ? singular : singular + &#039;s&#039;);
+
+      return &#039;&#039; + count + &#039; &#039; + word;
+    }
+
+    function specHref(result) {
+      return addToExistingQueryString(&#039;spec&#039;, result.fullName);
+    }
+
+    function seedHref(seed) {
+      return addToExistingQueryString(&#039;seed&#039;, seed);
+    }
+
+    function defaultQueryString(key, value) {
+      return &#039;?&#039; + key + &#039;=&#039; + value;
+    }
+
+    function setMenuModeTo(mode) {
+      htmlReporterMain.setAttribute(&#039;class&#039;, &#039;jasmine_html-reporter &#039; + mode);
+    }
+
+    function noExpectations(result) {
+      return (result.failedExpectations.length + result.passedExpectations.length) === 0 &amp;&amp;
+        result.status === &#039;passed&#039;;
+    }
+  }
+
+  return HtmlReporter;
+};
+
+jasmineRequire.HtmlSpecFilter = function() {
+  function HtmlSpecFilter(options) {
+    var filterString = options &amp;&amp; options.filterString() &amp;&amp; options.filterString().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, &#039;\\$&amp;&#039;);
+    var filterPattern = new RegExp(filterString);
+
+    this.matches = function(specName) {
+      return filterPattern.test(specName);
+    };
+  }
+
+  return HtmlSpecFilter;
+};
+
+jasmineRequire.ResultsNode = function() {
+  function ResultsNode(result, type, parent) {
+    this.result = result;
+    this.type = type;
+    this.parent = parent;
+
+    this.children = [];
+
+    this.addChild = function(result, type) {
+      this.children.push(new ResultsNode(result, type, this));
+    };
+
+    this.last = function() {
+      return this.children[this.children.length - 1];
+    };
+  }
+
+  return ResultsNode;
+};
+
+jasmineRequire.QueryString = function() {
+  function QueryString(options) {
+
+    this.navigateWithNewParam = function(key, value) {
+      options.getWindowLocation().search = this.fullStringWithNewParam(key, value);
+    };
+
+    this.fullStringWithNewParam = function(key, value) {
+      var paramMap = queryStringToParamMap();
+      paramMap[key] = value;
+      return toQueryString(paramMap);
+    };
+
+    this.getParam = function(key) {
+      return queryStringToParamMap()[key];
+    };
+
+    return this;
+
+    function toQueryString(paramMap) {
+      var qStrPairs = [];
+      for (var prop in paramMap) {
+        qStrPairs.push(encodeURIComponent(prop) + &#039;=&#039; + encodeURIComponent(paramMap[prop]));
+      }
+      return &#039;?&#039; + qStrPairs.join(&#039;&amp;&#039;);
+    }
+
+    function queryStringToParamMap() {
+      var paramStr = options.getWindowLocation().search.substring(1),
+        params = [],
+        paramMap = {};
+
+      if (paramStr.length &gt; 0) {
+        params = paramStr.split(&#039;&amp;&#039;);
+        for (var i = 0; i &lt; params.length; i++) {
+          var p = params[i].split(&#039;=&#039;);
+          var value = decodeURIComponent(p[1]);
+          if (value === &#039;true&#039; || value === &#039;false&#039;) {
+            value = JSON.parse(value);
+          }
+          paramMap[decodeURIComponent(p[0])] = value;
+        }
+      }
+
+      return paramMap;
+    }
+
+  }
+
+  return QueryString;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

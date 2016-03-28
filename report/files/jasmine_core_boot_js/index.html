@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - jasmine-core/boot.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>jasmine-core/boot.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.46</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">120</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">19.35</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.72</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*
+Copyright (c) 2008-2015 Pivotal Labs
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+&quot;Software&quot;), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+/**
+ Starting with version 2.0, this file &quot;boots&quot; Jasmine, performing all of the necessary initialization before executing the loaded environment and all of a project&#039;s specs. This file should be loaded after `jasmine.js` and `jasmine_html.js`, but before any project source files or spec files are loaded. Thus this file can also be used to customize Jasmine for a project.
+
+ If a project is using Jasmine via the standalone distribution, this file can be customized directly. If a project is using Jasmine via the [Ruby gem][jasmine-gem], this file can be copied into the support directory via `jasmine copy_boot_js`. Other environments (e.g., Python) will have different mechanisms.
+
+ The location of `boot.js` can be specified and/or overridden in `jasmine.yml`.
+
+ [jasmine-gem]: http://github.com/pivotal/jasmine-gem
+ */
+
+(function() {
+
+  /**
+   * ## Require &amp;amp; Instantiate
+   *
+   * Require Jasmine&#039;s core files. Specifically, this requires and attaches all of Jasmine&#039;s code to the `jasmine` reference.
+   */
+  window.jasmine = jasmineRequire.core(jasmineRequire);
+
+  /**
+   * Since this is being run in a browser and the results should populate to an HTML page, require the HTML-specific Jasmine code, injecting the same reference.
+   */
+  jasmineRequire.html(jasmine);
+
+  /**
+   * Create the Jasmine environment. This is used to run all specs in a project.
+   */
+  var env = jasmine.getEnv();
+
+  /**
+   * ## The Global Interface
+   *
+   * Build up the functions that will be exposed as the Jasmine public interface. A project can customize, rename or alias any of these functions as desired, provided the implementation remains unchanged.
+   */
+  var jasmineInterface = jasmineRequire.interface(jasmine, env);
+
+  /**
+   * Add all of the Jasmine global/public interface to the global scope, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
+   */
+  extend(window, jasmineInterface);
+
+  /**
+   * ## Runner Parameters
+   *
+   * More browser specific code - wrap the query string in an object and to allow for getting/setting parameters from the runner user interface.
+   */
+
+  var queryString = new jasmine.QueryString({
+    getWindowLocation: function() { return window.location; }
+  });
+
+  var catchingExceptions = queryString.getParam(&quot;catch&quot;);
+  env.catchExceptions(typeof catchingExceptions === &quot;undefined&quot; ? true : catchingExceptions);
+
+  var throwingExpectationFailures = queryString.getParam(&quot;throwFailures&quot;);
+  env.throwOnExpectationFailure(throwingExpectationFailures);
+
+  var random = queryString.getParam(&quot;random&quot;);
+  env.randomizeTests(random);
+
+  var seed = queryString.getParam(&quot;seed&quot;);
+  if (seed) {
+    env.seed(seed);
+  }
+
+  /**
+   * ## Reporters
+   * The `HtmlReporter` builds all of the HTML UI for the runner page. This reporter paints the dots, stars, and x&#039;s for specs, as well as all spec names and all failures (if any).
+   */
+  var htmlReporter = new jasmine.HtmlReporter({
+    env: env,
+    onRaiseExceptionsClick: function() { queryString.navigateWithNewParam(&quot;catch&quot;, !env.catchingExceptions()); },
+    onThrowExpectationsClick: function() { queryString.navigateWithNewParam(&quot;throwFailures&quot;, !env.throwingExpectationFailures()); },
+    onRandomClick: function() { queryString.navigateWithNewParam(&quot;random&quot;, !env.randomTests()); },
+    addToExistingQueryString: function(key, value) { return queryString.fullStringWithNewParam(key, value); },
+    getContainer: function() { return document.body; },
+    createElement: function() { return document.createElement.apply(document, arguments); },
+    createTextNode: function() { return document.createTextNode.apply(document, arguments); },
+    timer: new jasmine.Timer()
+  });
+
+  /**
+   * The `jsApiReporter` also receives spec results, and is used by any environment that needs to extract the results  from JavaScript.
+   */
+  env.addReporter(jasmineInterface.jsApiReporter);
+  env.addReporter(htmlReporter);
+
+  /**
+   * Filter which specs will be run by matching the start of the full name against the `spec` query param.
+   */
+  var specFilter = new jasmine.HtmlSpecFilter({
+    filterString: function() { return queryString.getParam(&quot;spec&quot;); }
+  });
+
+  env.specFilter = function(spec) {
+    return specFilter.matches(spec.getFullName());
+  };
+
+  /**
+   * Setting up timing functions to be able to be overridden. Certain browsers (Safari, IE 8, phantomjs) require this hack.
+   */
+  window.setTimeout = window.setTimeout;
+  window.setInterval = window.setInterval;
+  window.clearTimeout = window.clearTimeout;
+  window.clearInterval = window.clearInterval;
+
+  /**
+   * ## Execution
+   *
+   * Replace the browser window&#039;s `onload`, ensure it&#039;s called, and then run all of the loaded specs. This includes initializing the `HtmlReporter` instance and then executing the loaded Jasmine environment. All of this will happen after all of the specs are loaded.
+   */
+  var currentWindowOnload = window.onload;
+
+  window.onload = function() {
+    if (currentWindowOnload) {
+      currentWindowOnload();
+    }
+    htmlReporter.initialize();
+    env.execute();
+  };
+
+  /**
+   * Helper function for readability above.
+   */
+  function extend(destination, source) {
+    for (var property in source) destination[property] = source[property];
+    return destination;
+  }
+
+}());</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
