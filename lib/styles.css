@@ -10,3 +10,14 @@ table {
     background-color: #f5f5f5;
     width: 100%;
 }
+
+.product-image-large {
+    border: thin solid lightgray;
+    height: 400px;
+    text-align: center;
+}
+
+.product-image-large p {
+    height: 100%;
+    line-height: 400px;
+}
