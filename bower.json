@@ -19,6 +19,8 @@
     "jasmine-core": "jasmine#^2.4.1"
   },
   "devDependencies": {
-    "jasmine-core": "jasmine#^2.4.1"
+    "jasmine-core": "jasmine#^2.4.1",
+    "font-awesome": "^4.5.0",
+    "toastr": "^2.1.2"
   }
 }
